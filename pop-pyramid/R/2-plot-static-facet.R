@@ -70,7 +70,7 @@ gen_plot <- function(country_arg, yrs = NULL) {
     ) +
     labs(
       title = country_dat$country[1],
-      subtitle = "Population pyramid every decade",
+      subtitle = "Population pyramid every 10 years",
       caption = paste0(
         "Data source: United Nations,\n",
         "Department of Economic and Social Affairs, Population Division (2024).\n",
