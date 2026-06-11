@@ -6,15 +6,16 @@ windowsFonts(Cambria = windowsFont("Cambria"))
 source(file.path("theme", "theme.R"))
 theme_set(theme_sv_d())
 
-facet_path <- file.path("pop-pyramid", "data", "facet")
+facet_path <- file.path("pop-pyramid", "data", "facet", "country")
 if (!dir.exists(facet_path)) {
   dir.create(facet_path, recursive = TRUE)
 }
 
-lbl_yr <- function(yrs) {
-  txt <- map_chr(yrs, \(yr) {
-    if (yr > 2024) paste0(yr, "*") else yr
-  })
+lbl_c <- function(cs) {
+  cs |> replace_values(
+    "Brunei Darussalam" ~ "Brunei",
+    "Lao People's Democratic Republic" ~ "Lao PDR"
+  )
 }
 
 sea <- c(
@@ -48,12 +49,11 @@ static_dat <- pop_dat |>
   mutate(sex = fct_relevel(sex, "male_sp", "male", "female_sp", "female"))
 
 
-gen_plot <- function(country_arg, yrs = NULL) {
-  if(is.null(yrs)) yrs <- c(seq(1950, 2100, 10))
+gen_plot <- function(countries, yr) {
 
   country_dat <- static_dat |>
-    filter(country %in% country_arg) |>
-    filter(year %in% yrs)
+    filter(country %in% countries) |>
+    filter(year == yr)
 
   plot <- ggplot(aes(pop_age_sex, age_grp, fill = sex), data = country_dat) +
     geom_col(
@@ -69,8 +69,8 @@ gen_plot <- function(country_arg, yrs = NULL) {
       )
     ) +
     labs(
-      title = country_dat$country[1],
-      subtitle = "Population pyramid every 10 years",
+      title = "Southeast Asia",
+      subtitle = glue::glue("Population pyramid, {yr}"),
       caption = paste0(
         "Data source: United Nations,\n",
         "Department of Economic and Social Affairs, Population Division (2024).\n",
@@ -84,13 +84,14 @@ gen_plot <- function(country_arg, yrs = NULL) {
       strip.text = element_text(size = 7)
     ) +
     facet_wrap(
-      vars(year),
-      labeller = labeller(year = lbl_yr),
+      vars(country),
+      scales = "free_x",
+      labeller = labeller(country = lbl_c),
       strip.position = "bottom"
     )
 
   ggsave(
-    glue::glue("{country_dat$country[1]}.png"),
+    "sea.png",
     plot = plot,
     path = facet_path,
     width = 1080,
@@ -99,4 +100,4 @@ gen_plot <- function(country_arg, yrs = NULL) {
   )
 }
 
-walk(sea, gen_plot)
+gen_plot(sea, 2026)
