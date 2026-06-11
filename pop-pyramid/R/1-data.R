@@ -55,6 +55,7 @@ pop_dat <- pop_obj |>
     names_to = "sex",
     values_to = "pop_age_sex"
   ) |>
-  mutate(across(c(pop_age_sex, pop_age), \(col) col * 1e3)) # data was in thousands
-
+  mutate(across(c(pop_age_sex, pop_age), \(col) col * 1e3)) |> # data was in thousands
+  select(!loc_type)
+  
 rm(list = grepv("pop_dat", ls(), invert = TRUE))

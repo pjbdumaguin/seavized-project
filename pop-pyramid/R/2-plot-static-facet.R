@@ -32,7 +32,6 @@ sea <- c(
 )
 
 static_dat <- pop_dat |>
-  select(!loc_type) |>
   filter(country %in% sea) |>
   pivot_wider(names_from = sex, values_from = pop_age_sex) |>
   mutate(surplus = male + female) |> # addition because male population is already in negative
